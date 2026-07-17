@@ -18,5 +18,10 @@
     "id": 1784281579109,
     "title": "Learn something new",
     "content": "Complete AI CRUD"
+  },
+  {
+    "id": 1784284110484,
+    "title": "Learn FastAPI",
+    "content": "Finish Python First"
   }
 ]
