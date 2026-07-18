@@ -33,7 +33,55 @@ export const createNote = (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: "Unable to create Note"
+      message: "Unable to create Note",
     });
   }
 };
+
+export const deleteNote = (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const notes = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    const updatedNotes = notes.filter((note) => note.id !== id);
+    fs.writeFileSync(filePath, JSON.stringify(updatedNotes, null, 2));
+    res.status(200).json({
+      message: "Node deleted Successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Unable to delete note",
+    });
+  }
+};
+
+export const updateNote = (req,res) =>{
+  try{
+    const id = Number(req.params.id)
+    const { title, content} = req.body;
+    const notes = JSON.parse(
+      fs.readFileSync(filePath,'utf-8')
+    );
+    const updatedNotes = notes.map((note)=>{
+      if(note.id === id){
+        return{
+          ...note,
+          title,
+          content
+        }
+      }
+      return note;
+    });
+    fs.writeFileSync(
+      filePath,
+      JSON.stringify(updatedNotes,null,2)
+    )
+    res.status(200).json({
+      message : "Note Updated Successfully"
+    })
+  }
+  catch(error){
+    res.status(500).json({
+      message : "Unable to update notes Successfully",
+    })
+  }
+}

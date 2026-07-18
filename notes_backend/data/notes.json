@@ -2,26 +2,16 @@
   {
     "id": 1,
     "title": "Learn Express",
-    "content": "Complete Express basics"
+    "content": "Complete Express basics first"
   },
   {
     "id": 2,
-    "title": "Learn React",
-    "content": "Finish React components"
+    "title": "React Updated",
+    "content": "Hooks Completed lastly"
   },
   {
-    "id": 1784281407010,
-    "title": "Learn Node",
-    "content": "Complete Express CRUD"
-  },
-  {
-    "id": 1784281579109,
-    "title": "Learn something new",
-    "content": "Complete AI CRUD"
-  },
-  {
-    "id": 1784284110484,
-    "title": "Learn FastAPI",
-    "content": "Finish Python First"
+    "id": 1784339377191,
+    "title": "sister",
+    "content": "angel agrawal"
   }
 ]

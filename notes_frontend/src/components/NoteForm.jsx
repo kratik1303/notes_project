@@ -1,45 +1,111 @@
 import { useState } from "react";
+import API from "../services/api";
+import { useEffect } from "react";
 
-function NoteForm({ addNote }) {
+function NoteForm({ addNote, editingNote, setEditingNote, fetchNotes }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [error, setError] = useState("");
+  useEffect(() => {
+    if (editingNote) {
+      setTitle(editingNote.title);
+      setContent(editingNote.content);
+    }
+  }, [editingNote]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    addNote({
-      title,
-      content,
-    });
+    // addNote({
+    //   title,
+    //   content,
+    // });
+    if (!title.trim()) {
+      setError("Title is required");
+      return;
+    }
+    if (!content.trim()) {
+      setError("Content is Required");
+      return;
+    }
+    setError("");
+    try {
+      if (editingNote) {
+        await API.put(`/notes/${editingNote.id}`, {
+          title,
+          content,
+        });
+        fetchNotes();
+        setEditingNote(null);
+      } else {
+        addNote({
+          title,
+          content,
+        });
+      }
 
-    setTitle("");
-    setContent("");
+      setTitle("");
+      setContent("");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Enter Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
+ return (
+  <form onSubmit={handleSubmit} className="space-y-4">
+    {error && (
+      <p className="bg-red-100 text-red-600 p-3 rounded-lg">
+        {error}
+      </p>
+    )}
 
-      <br />
-      <br />
+    <input
+      type="text"
+      placeholder="Enter Title"
+      value={title}
+      onChange={(e) => {
+        setTitle(e.target.value);
+        setError("");
+      }}
+      className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
 
-      <textarea
-        placeholder="Enter Content"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
+    <textarea
+      placeholder="Enter Content"
+      value={content}
+      onChange={(e) => {
+        setContent(e.target.value);
+        setError("");
+      }}
+      rows="5"
+      className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
 
-      <br />
-      <br />
+    <div className="flex gap-3">
+      <button
+        type="submit"
+        className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition"
+      >
+        {editingNote ? "Update Note" : "Add Note"}
+      </button>
 
-      <button type="submit">Add Note</button>
-    </form>
-  );
+      {editingNote && (
+        <button
+          type="button"
+          onClick={() => {
+            setEditingNote(null);
+            setTitle("");
+            setContent("");
+            setError("");
+          }}
+          className="bg-gray-500 text-white px-5 py-2 rounded-lg hover:bg-gray-600 transition"
+        >
+          Cancel
+        </button>
+      )}
+    </div>
+  </form>
+);
 }
 
 export default NoteForm;
