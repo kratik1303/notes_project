@@ -1,6 +1,8 @@
 import { useState } from "react";
 import API from "../services/api";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
+
 
 function NoteForm({ addNote, editingNote, setEditingNote, fetchNotes }) {
   const [title, setTitle] = useState("");
@@ -37,6 +39,7 @@ function NoteForm({ addNote, editingNote, setEditingNote, fetchNotes }) {
         });
         fetchNotes();
         setEditingNote(null);
+        toast.success("Note Updated Successfully")
       } else {
         addNote({
           title,
@@ -48,6 +51,7 @@ function NoteForm({ addNote, editingNote, setEditingNote, fetchNotes }) {
       setContent("");
     } catch (error) {
       console.log(error);
+      toast.error("Something went wrong")
     }
   };
 
