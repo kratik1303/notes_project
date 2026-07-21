@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import notesRouter from "./routes/notes.routes.js";
 import connectDB from "./config/db.js";
-
+import authRouter from "./routes/auth.routes.js";
 dotenv.config();
 connectDB();
 
@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/notes", notesRouter);
-
+app.use("/auth",authRouter);
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

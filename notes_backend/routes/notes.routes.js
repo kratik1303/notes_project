@@ -6,13 +6,14 @@ import {
   updateNote,
   togglePin,
 } from "../controllers/notes.controller.js";
+import protect from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.get("/", getAllNotes);
-router.post("/", createNote);
-router.delete("/:id", deleteNote);
-router.put("/:id", updateNote);
-router.put("/:id/pin", togglePin);
+router.get("/", protect, getAllNotes);
+router.post("/", protect, createNote);
+router.delete("/:id", protect, deleteNote);
+router.put("/:id", protect, updateNote);
+router.put("/:id/pin", protect, togglePin);
 
 export default router;

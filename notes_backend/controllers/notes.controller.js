@@ -3,7 +3,12 @@ import Note from "../models/Note.js";
 // Get All Notes
 export const getAllNotes = async (req, res) => {
   try {
-    const notes = await Note.find().sort({ pinned: -1, createdAt: -1 });
+    const notes = await Note.find({
+      user: req.user._id,
+    }).sort({
+      pinned: -1,
+      createdAt: -1,
+    });
 
     res.status(200).json(notes);
   } catch (error) {
@@ -22,6 +27,7 @@ export const createNote = async (req, res) => {
     const note = await Note.create({
       title,
       content,
+      user: req.user._id,
       pinned: false,
     });
 
@@ -42,8 +48,11 @@ export const updateNote = async (req, res) => {
   try {
     const { title, content } = req.body;
 
-    const updatedNote = await Note.findByIdAndUpdate(
-      req.params.id,
+    const updatedNote = await Note.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        user: req.user._id,
+      },
       {
         title,
         content,
@@ -51,7 +60,7 @@ export const updateNote = async (req, res) => {
       {
         new: true,
         runValidators: true,
-      }
+      },
     );
 
     if (!updatedNote) {
@@ -75,7 +84,10 @@ export const updateNote = async (req, res) => {
 // Delete Note
 export const deleteNote = async (req, res) => {
   try {
-    const deletedNote = await Note.findByIdAndDelete(req.params.id);
+    const deletedNote = await Note.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user._id,
+    });
 
     if (!deletedNote) {
       return res.status(404).json({
@@ -97,7 +109,10 @@ export const deleteNote = async (req, res) => {
 // Toggle Pin
 export const togglePin = async (req, res) => {
   try {
-    const note = await Note.findById(req.params.id);
+    const note = await Note.findOne({
+      _id: req.params.id,
+      user: req.user._id,
+    });
 
     if (!note) {
       return res.status(404).json({
