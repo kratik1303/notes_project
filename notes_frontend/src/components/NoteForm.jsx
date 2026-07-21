@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import API from "../services/api";
-import { useEffect } from "react";
 import toast from "react-hot-toast";
 
 function NoteForm({
@@ -13,6 +12,7 @@ function NoteForm({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [error, setError] = useState("");
+
   useEffect(() => {
     if (editingNote) {
       setTitle(editingNote.title);
@@ -23,30 +23,30 @@ function NoteForm({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // addNote({
-    //   title,
-    //   content,
-    // });
     if (!title.trim()) {
       setError("Title is required");
       return;
     }
+
     if (!content.trim()) {
-      setError("Content is Required");
+      setError("Content is required");
       return;
     }
+
     setError("");
+
     try {
       if (editingNote) {
-        await API.put(`/notes/${editingNote.id}`, {
+        await API.put(`/notes/${editingNote._id}`, {
           title,
           content,
         });
+
         fetchNotes();
         setEditingNote(null);
         toast.success("Note Updated Successfully");
       } else {
-        addNote({
+        await addNote({
           title,
           content,
         });
@@ -63,7 +63,9 @@ function NoteForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <p className="bg-red-100 text-red-600 p-3 rounded-lg">{error}</p>
+        <p className="bg-red-100 text-red-600 p-3 rounded-lg">
+          {error}
+        </p>
       )}
 
       <input
@@ -74,7 +76,6 @@ function NoteForm({
           setTitle(e.target.value);
           setError("");
         }}
-        // className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
         className={`w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
           darkMode
             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
@@ -90,7 +91,6 @@ function NoteForm({
           setError("");
         }}
         rows="5"
-        // className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
         className={`w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
           darkMode
             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"

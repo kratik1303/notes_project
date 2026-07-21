@@ -38,7 +38,7 @@ function DeleteModal({ note, onClose, onConfirm, darkMode }) {
           </button>
 
           <button
-            onClick={() => onConfirm(note.id)}
+            onClick={() => onConfirm(note._id)}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
           >
             Delete

@@ -1,111 +1,122 @@
-import fs from "fs";
+import Note from "../models/Note.js";
 
-const filePath = "./data/notes.json";
-
-export const getAllNotes = (req, res) => {
+// Get All Notes
+export const getAllNotes = async (req, res) => {
   try {
-    const notes = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    const notes = await Note.find().sort({ pinned: -1, createdAt: -1 });
 
     res.status(200).json(notes);
   } catch (error) {
     res.status(500).json({
       message: "Unable to fetch notes",
+      error: error.message,
     });
   }
 };
 
-export const createNote = (req, res) => {
+// Create Note
+export const createNote = async (req, res) => {
   try {
     const { title, content } = req.body;
-    const notes = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    const newNote = {
-      id: Date.now(),
+
+    const note = await Note.create({
       title,
       content,
-      createdAt: new Date().toISOString(),
       pinned: false,
-    };
-    notes.push(newNote);
-
-    fs.writeFileSync(filePath, JSON.stringify(notes, null, 2));
+    });
 
     res.status(201).json({
       message: "Note Created",
-      note: newNote,
+      note,
     });
   } catch (error) {
     res.status(500).json({
-      message: "Unable to create Note",
+      message: "Unable to create note",
+      error: error.message,
     });
   }
 };
 
-export const deleteNote = (req, res) => {
+// Update Note
+export const updateNote = async (req, res) => {
   try {
-    const id = Number(req.params.id);
-    const notes = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    const updatedNotes = notes.filter((note) => note.id !== id);
-    fs.writeFileSync(filePath, JSON.stringify(updatedNotes, null, 2));
+    const { title, content } = req.body;
+
+    const updatedNote = await Note.findByIdAndUpdate(
+      req.params.id,
+      {
+        title,
+        content,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!updatedNote) {
+      return res.status(404).json({
+        message: "Note not found",
+      });
+    }
+
     res.status(200).json({
-      message: "Node deleted Successfully",
+      message: "Note Updated Successfully",
+      note: updatedNote,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Unable to update note",
+      error: error.message,
+    });
+  }
+};
+
+// Delete Note
+export const deleteNote = async (req, res) => {
+  try {
+    const deletedNote = await Note.findByIdAndDelete(req.params.id);
+
+    if (!deletedNote) {
+      return res.status(404).json({
+        message: "Note not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Note Deleted Successfully",
     });
   } catch (error) {
     res.status(500).json({
       message: "Unable to delete note",
+      error: error.message,
     });
   }
 };
 
-export const updateNote = (req, res) => {
+// Toggle Pin
+export const togglePin = async (req, res) => {
   try {
-    const id = Number(req.params.id);
-    const { title, content } = req.body;
-    const notes = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    const updatedNotes = notes.map((note) => {
-      if (note.id === id) {
-        return {
-          ...note,
-          title,
-          content,
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return note;
-    });
-    fs.writeFileSync(filePath, JSON.stringify(updatedNotes, null, 2));
+    const note = await Note.findById(req.params.id);
+
+    if (!note) {
+      return res.status(404).json({
+        message: "Note not found",
+      });
+    }
+
+    note.pinned = !note.pinned;
+
+    await note.save();
+
     res.status(200).json({
-      message: "Note Updated Successfully",
+      message: "Pin status updated",
+      note,
     });
   } catch (error) {
     res.status(500).json({
-      message: "Unable to update notes Successfully",
+      message: "Unable to update pin",
+      error: error.message,
     });
   }
 };
-
-export const togglePin = (req,res) =>{
-  try{
-    const id = Number(req.params.id);
-    const notes = JSON.parse(fs.readFileSync(filePath,'utf-8'))
-    const updatedNotes = notes.map((note)=>{
-      if(note.id === id)
-      {
-        return{
-          ...note,
-          pinned :!note.pinned,
-        }
-      }
-      return note; 
-    })
-    fs.writeFileSync(filePath,JSON.stringify(updatedNotes,null,2))
-    res.status(200).json({
-      message : "Pin status updated",
-    })
-  }
-  catch(error){
-    res.status(500).json({
-      message : "Unable to update the pin",
-      error : error.message,
-    })
-  }
-}

@@ -10,6 +10,7 @@ function Home() {
   const [editingNote, setEditingNote] = useState(null);
   const [search, setSearch] = useState("");
   const [noteToDelete, setNoteToDelete] = useState(null);
+
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("theme") === "dark";
   });
@@ -21,9 +22,11 @@ function Home() {
   useEffect(() => {
     localStorage.setItem("theme", darkMode ? "dark" : "light");
   }, [darkMode]);
+
   const fetchNotes = async () => {
     try {
       const response = await API.get("/notes");
+      console.log(response.data);
       setNotes(response.data);
     } catch (error) {
       console.log(error);
@@ -36,19 +39,19 @@ function Home() {
       fetchNotes();
       toast.success("Note added Successfully");
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       toast.error("Unable to add note");
     }
   };
 
-  const deleteNote = async (id) => {
+  const deleteNote = async (_id) => {
     try {
-      await API.delete(`/notes/${id}`);
+      await API.delete(`/notes/${_id}`);
       fetchNotes();
       setNoteToDelete(null);
       toast.success("Note deleted");
     } catch (error) {
-      // console.log(error);
+      console.log(error);
       toast.error("Unable to delete note");
     }
   };
@@ -56,7 +59,7 @@ function Home() {
   const filteredNotes = notes.filter(
     (note) =>
       note.title.toLowerCase().includes(search.toLowerCase()) ||
-      note.content.toLowerCase().includes(search.toLowerCase()),
+      note.content.toLowerCase().includes(search.toLowerCase())
   );
 
   const sortedNotes = [...filteredNotes].sort((a, b) => {
@@ -64,14 +67,14 @@ function Home() {
     return a.pinned ? -1 : 1;
   });
 
-  const togglePin = async (id) => {
+  const togglePin = async (_id) => {
     try {
-      await API.put(`/notes/${id}/pin`);
+      await API.put(`/notes/${_id}/pin`);
       fetchNotes();
       toast.success("Pin status updated");
     } catch (error) {
       console.log(error);
-      toast.error("Unable to Update pin");
+      toast.error("Unable to update pin");
     }
   };
 
@@ -83,7 +86,7 @@ function Home() {
         }`}
       >
         <div className="max-w-4xl mx-auto">
-          {/* <h1 className="text-4xl font-bold text-center mb-8">📝 Notes AI</h1> */}
+
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-4xl font-bold">📝 Notes AI</h1>
 
@@ -94,7 +97,7 @@ function Home() {
               {darkMode ? "☀️ Light" : "🌙 Dark"}
             </button>
           </div>
-          {/* <div className="bg-white rounded-xl shadow-lg p-6 mb-8"> */}
+
           <div
             className={`rounded-xl shadow-lg p-6 mb-8 ${
               darkMode ? "bg-gray-800 text-white" : "bg-white text-black"
@@ -112,24 +115,23 @@ function Home() {
           <div className="mb-6">
             <input
               type="text"
-              placeholder=" Search notes..."
+              placeholder="Search notes..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              // className=" w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               className={`w-full p-3 border rounded-lg shadow-sm
-focus:outline-none focus:ring-2 focus:ring-blue-500 transition
-${
-  darkMode
-    ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400"
-    : "bg-white border-gray-300 text-black placeholder-gray-500"
-}`}
+              focus:outline-none focus:ring-2 focus:ring-blue-500 transition
+              ${
+                darkMode
+                  ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400"
+                  : "bg-white border-gray-300 text-black placeholder-gray-500"
+              }`}
             />
           </div>
+
           <div className="space-y-4">
-            {/* <div className="space-y-4"> */}
             {sortedNotes.map((note) => (
               <NoteCard
-                key={note.id}
+                key={note._id}
                 note={note}
                 onEdit={setEditingNote}
                 onDelete={setNoteToDelete}
@@ -137,10 +139,11 @@ ${
                 darkMode={darkMode}
               />
             ))}
-            {/* </div> */}
           </div>
+
         </div>
       </div>
+
       <DeleteModal
         note={noteToDelete}
         onClose={() => setNoteToDelete(null)}

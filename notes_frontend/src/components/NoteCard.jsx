@@ -2,9 +2,7 @@ function NoteCard({ note, onEdit, onDelete, onPin, darkMode }) {
   return (
     <div
       className={`rounded-xl shadow-lg p-5 transition-all duration-300 ${
-        darkMode
-          ? "bg-gray-800 text-white"
-          : "bg-white text-black"
+        darkMode ? "bg-gray-800 text-white" : "bg-white text-black"
       }`}
     >
       {/* Title + Pin */}
@@ -35,21 +33,19 @@ function NoteCard({ note, onEdit, onDelete, onPin, darkMode }) {
       >
         📅 Created:{" "}
         {note.createdAt
-          ? new Date(note.createdAt).toLocaleDateString()
+          ? new Date(note.createdAt).toLocaleString()
           : "No Date"}
       </p>
 
       {/* Updated Date */}
       {note.updatedAt && (
-        <p className="text-sm text-blue-500">
-          ✏️ Updated:{" "}
-          {new Date(note.updatedAt).toLocaleString()}
+        <p className="text-sm text-blue-500 mt-1">
+          ✏️ Updated: {new Date(note.updatedAt).toLocaleString()}
         </p>
       )}
 
       {/* Buttons */}
       <div className="mt-5 flex gap-3 flex-wrap">
-
         <button
           onClick={() => onEdit(note)}
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
@@ -58,7 +54,7 @@ function NoteCard({ note, onEdit, onDelete, onPin, darkMode }) {
         </button>
 
         <button
-          onClick={() => onPin(note.id)}
+          onClick={() => onPin(note._id)}
           className={`px-4 py-2 rounded-lg transition ${
             note.pinned
               ? "bg-yellow-500 text-white hover:bg-yellow-600"
@@ -74,7 +70,6 @@ function NoteCard({ note, onEdit, onDelete, onPin, darkMode }) {
         >
           🗑 Delete
         </button>
-
       </div>
     </div>
   );
